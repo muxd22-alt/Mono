@@ -1,6 +1,6 @@
-# Mono — Signal OS
+# Signal OS
 
-Mono is an externalized attention and personal signal operating system. Every issue opened in this repository becomes an inbox item; GitHub Actions score it against your `interests.md` profile via OpenRouter, route urgent alerts directly to Telegram, classify items into 6 core pillars, and log them as permanent, numbered entries in `knowledge_base.jsonl`.
+Signal OS is an externalized attention and personal signal operating system. Every issue opened in this repository becomes an inbox item; GitHub Actions score it against your `interests.md` profile via OpenRouter, route urgent alerts directly to Telegram, classify items into 6 core pillars, and log them as permanent, numbered entries in `knowledge_base.jsonl`.
 
 ---
 
@@ -23,7 +23,7 @@ Mono is an externalized attention and personal signal operating system. Every is
 ## 🛠️ Architecture
 
 ```
-Mono/
+Signal OS/
 ├── .github/workflows/
 │   ├── score-issue.yml       # Scores opened issues, alerts Telegram, updates KB
 │   └── daily-enrich.yml      # Daily repo scanning & daily digest generation
