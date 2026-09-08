@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Mono — Personal Signal OS. An externalized attention system that catches signals early across finance, AI, economy, and infrastructure.">
+    <title>Mono — Signal OS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+    <!-- ─── Loading Screen ─── -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">⚡</div>
+            <div class="loading-text">MONO</div>
+            <div class="loading-sub">Signal OS</div>
+            <div class="loading-bar"><div class="loading-fill"></div></div>
+        </div>
+    </div>
+
+    <!-- ─── App Shell ─── -->
+    <div id="app" class="app hidden">
+        <!-- ─── Header ─── -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">MONO</span>
+                    <span class="logo-badge">Signal OS</span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="search-bar" id="search-bar">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <input type="text" id="search-input" placeholder="Search repos, entries, signals..." autocomplete="off">
+                    <kbd class="search-kbd">⌘K</kbd>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-indicator" id="status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Synced</span>
+                </div>
+                <button class="btn-icon" id="btn-refresh" title="Refresh data">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                </button>
+                <button class="btn-icon" id="btn-settings" title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- ─── Main Layout ─── -->
+        <div class="main-layout">
+            <!-- ─── Sidebar ─── -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Views</h3>
+                    <button class="nav-item active" data-view="today" id="nav-today">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-label">Today</span>
+                        <span class="nav-count" id="today-count">0</span>
+                    </button>
+                    <button class="nav-item" data-view="repos" id="nav-repos">
+                        <span class="nav-icon">📦</span>
+                        <span class="nav-label">Repos</span>
+                        <span class="nav-count" id="repos-count">0</span>
+                    </button>
+                    <button class="nav-item" data-view="knowledge" id="nav-knowledge">
+                        <span class="nav-icon">🧠</span>
+                        <span class="nav-label">Knowledge</span>
+                        <span class="nav-count" id="kb-count">0</span>
+                    </button>
+                    <button class="nav-item" data-view="capture" id="nav-capture">
+                        <span class="nav-icon">✏️</span>
+                        <span class="nav-label">Capture</span>
+                    </button>
+                </div>
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Pillars</h3>
+                    <button class="nav-item pillar-filter" data-pillar="all">
+                        <span class="nav-icon">◉</span>
+                        <span class="nav-label">All Pillars</span>
+                    </button>
+                    <button class="nav-item pillar-filter" data-pillar="financial">
+                        <span class="nav-icon">🔵</span>
+                        <span class="nav-label">Finance</span>
+                        <span class="nav-count pillar-count" data-pillar-count="financial">0</span>
+                    </button>
+                    <button class="nav-item pillar-filter" data-pillar="ai">
+                        <span class="nav-icon">🟣</span>
+                        <span class="nav-label">AI / AGI</span>
+                        <span class="nav-count pillar-count" data-pillar-count="ai">0</span>
+                    </button>
+                    <button class="nav-item pillar-filter" data-pillar="saudi">
+                        <span class="nav-icon">🟢</span>
+                        <span class="nav-label">Saudi Eco</span>
+                        <span class="nav-count pillar-count" data-pillar-count="saudi">0</span>
+                    </button>
+                    <button class="nav-item pillar-filter" data-pillar="products">
+                        <span class="nav-icon">🟠</span>
+                        <span class="nav-label">Products</span>
+                        <span class="nav-count pillar-count" data-pillar-count="products">0</span>
+                    </button>
+                    <button class="nav-item pillar-filter" data-pillar="mobile">
+                        <span class="nav-icon">🔴</span>
+                        <span class="nav-label">Mobile/Infra</span>
+                        <span class="nav-count pillar-count" data-pillar-count="mobile">0</span>
+                    </button>
+                    <button class="nav-item pillar-filter" data-pillar="news">
+                        <span class="nav-icon">🟡</span>
+                        <span class="nav-label">News</span>
+                        <span class="nav-count pillar-count" data-pillar-count="news">0</span>
+                    </button>
+                </div>
+                <div class="sidebar-footer">
+                    <div class="sync-info" id="sync-info">
+                        Last sync: —
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ─── Content Area ─── -->
+            <main class="content" id="content">
+
+                <!-- ─── TODAY VIEW ─── -->
+                <section class="view active" id="view-today">
+                    <div class="view-header">
+                        <h1>Today</h1>
+                        <p class="view-subtitle" id="today-date"></p>
+                    </div>
+
+                    <!-- Stats strip -->
+                    <div class="stats-strip" id="stats-strip">
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-total">0</div>
+                            <div class="stat-label">Total Entries</div>
+                        </div>
+                        <div class="stat-card stat-interrupt">
+                            <div class="stat-value" id="stat-interrupts">0</div>
+                            <div class="stat-label">🚨 Interrupts</div>
+                        </div>
+                        <div class="stat-card stat-watch">
+                            <div class="stat-value" id="stat-watch">0</div>
+                            <div class="stat-label">⚠️ Watch</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="stat-repos-active">0</div>
+                            <div class="stat-label">Active Repos</div>
+                        </div>
+                    </div>
+
+                    <!-- Interrupt Banner -->
+                    <div class="interrupt-section" id="interrupt-section" style="display:none;">
+                        <h2 class="section-title section-title-interrupt">🚨 Immediate Attention</h2>
+                        <div class="entry-list" id="interrupt-list"></div>
+                    </div>
+
+                    <!-- Watch Items -->
+                    <div class="watch-section" id="watch-section" style="display:none;">
+                        <h2 class="section-title section-title-watch">⚠️ Watch</h2>
+                        <div class="entry-list" id="watch-list"></div>
+                    </div>
+
+                    <!-- Active Repos Today -->
+                    <div class="active-section">
+                        <h2 class="section-title">Active Repos Today</h2>
+                        <div class="repo-chips" id="active-repos-chips"></div>
+                    </div>
+
+                    <!-- Recent Entries -->
+                    <div class="recent-section">
+                        <h2 class="section-title">Recent Entries</h2>
+                        <div class="entry-list" id="recent-list"></div>
+                        <div class="empty-state" id="empty-today" style="display:none;">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-text">No entries yet today</div>
+                            <div class="empty-sub">Open a GitHub Issue to capture a signal</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ─── REPOS VIEW ─── -->
+                <section class="view" id="view-repos">
+                    <div class="view-header">
+                        <h1>Repos</h1>
+                        <p class="view-subtitle">Your sensor network across both accounts</p>
+                    </div>
+                    <div class="pillar-tabs" id="pillar-tabs">
+                        <button class="pillar-tab active" data-tab="all">All</button>
+                        <button class="pillar-tab" data-tab="financial">🔵 Finance</button>
+                        <button class="pillar-tab" data-tab="ai">🟣 AI</button>
+                        <button class="pillar-tab" data-tab="saudi">🟢 Saudi</button>
+                        <button class="pillar-tab" data-tab="products">🟠 Products</button>
+                        <button class="pillar-tab" data-tab="mobile">🔴 Mobile</button>
+                        <button class="pillar-tab" data-tab="news">🟡 News</button>
+                    </div>
+                    <div class="repo-grid" id="repo-grid"></div>
+                    <div class="empty-state" id="empty-repos" style="display:none;">
+                        <div class="empty-icon">📡</div>
+                        <div class="empty-text">No repo data yet</div>
+                        <div class="empty-sub">Run the daily enrichment workflow or wait for the next scheduled run</div>
+                    </div>
+                </section>
+
+                <!-- ─── KNOWLEDGE VIEW ─── -->
+                <section class="view" id="view-knowledge">
+                    <div class="view-header">
+                        <h1>Knowledge Base</h1>
+                        <p class="view-subtitle">Every signal, scored and filed</p>
+                    </div>
+                    <div class="kb-controls">
+                        <select id="kb-sort" class="select-styled">
+                            <option value="newest">Newest First</option>
+                            <option value="urgency">Highest Urgency</option>
+                            <option value="relevance">Highest Relevance</option>
+                            <option value="novelty">Highest Novelty</option>
+                        </select>
+                        <select id="kb-pillar-filter" class="select-styled">
+                            <option value="all">All Pillars</option>
+                            <option value="financial">🔵 Finance</option>
+                            <option value="ai">🟣 AI / AGI</option>
+                            <option value="saudi">🟢 Saudi</option>
+                            <option value="products">🟠 Products</option>
+                            <option value="mobile">🔴 Mobile</option>
+                            <option value="news">🟡 News</option>
+                        </select>
+                    </div>
+                    <div class="entry-list" id="kb-list"></div>
+                    <div class="empty-state" id="empty-kb" style="display:none;">
+                        <div class="empty-icon">🧠</div>
+                        <div class="empty-text">Knowledge base is empty</div>
+                        <div class="empty-sub">Open GitHub Issues to start filing entries</div>
+                    </div>
+                </section>
+
+                <!-- ─── CAPTURE VIEW ─── -->
+                <section class="view" id="view-capture">
+                    <div class="view-header">
+                        <h1>Capture</h1>
+                        <p class="view-subtitle">Drop a signal — the system does the rest</p>
+                    </div>
+                    <div class="capture-card">
+                        <div class="capture-input-group">
+                            <input type="text" id="capture-title" class="capture-title-input" placeholder="Signal title (e.g. 'AGI paper from DeepMind')">
+                            <textarea id="capture-body" class="capture-body-input" rows="6" placeholder="URL, keyword, note, or paste anything...&#10;&#10;The scorer will analyze it against your interest profile,&#10;classify it into a pillar, and file it in the knowledge base."></textarea>
+                        </div>
+                        <div class="capture-actions">
+                            <button class="btn-primary" id="btn-capture">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M22 2 11 13"/><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
+                                Create Issue
+                            </button>
+                            <span class="capture-hint">Opens a GitHub Issue → triggers the scorer automatically</span>
+                        </div>
+                    </div>
+                    <div class="capture-info">
+                        <h3>How it works</h3>
+                        <div class="flow-steps">
+                            <div class="flow-step">
+                                <div class="flow-step-num">1</div>
+                                <div class="flow-step-text">You drop a keyword, URL, or note</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="flow-step">
+                                <div class="flow-step-num">2</div>
+                                <div class="flow-step-text">GitHub Action scores it via OpenRouter</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="flow-step">
+                                <div class="flow-step-num">3</div>
+                                <div class="flow-step-text">Urgent? → Telegram ping. Otherwise → digest</div>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="flow-step">
+                                <div class="flow-step-num">4</div>
+                                <div class="flow-step-text">Filed permanently in knowledge_base.jsonl</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- ─── Settings Modal ─── -->
+    <div class="modal-overlay" id="settings-modal" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="btn-icon modal-close" id="btn-close-settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label class="setting-label">GitHub Repository</label>
+                    <input type="text" id="setting-repo" class="setting-input" placeholder="owner/repo (e.g. muxd22-alt/Mono)" value="">
+                    <p class="setting-hint">The repo where issues are created and data is stored</p>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">Data Mode</label>
+                    <select id="setting-data-mode" class="setting-input">
+                        <option value="local">Local (data/ folder)</option>
+                        <option value="api">GitHub API (live)</option>
+                    </select>
+                    <p class="setting-hint">Local reads from deployed data files. API fetches live from GitHub.</p>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">Theme</label>
+                    <select id="setting-theme" class="setting-input">
+                        <option value="dark">Dark</option>
+                        <option value="midnight">Midnight</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="btn-save-settings">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

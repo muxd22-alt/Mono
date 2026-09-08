@@ -1,0 +1,15 @@
+# Secrets — NEVER commit
+.env
+secrets.json
+
+# System
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Draft/scratch
+system/
+github_test/
+all_promot*
