@@ -59,8 +59,8 @@ To enable automated scoring, Telegram alerts, and private/cross-account reposito
 
 1. **Clone / Fork the Repository**:
    ```bash
-   git clone https://github.com/muxd22-alt/Signal-OS.git
-   cd Signal-OS
+   git clone https://github.com/muxd22-alt/Mono.git
+   cd Mono
    ```
 
 2. **Customize `interests.md`**:
