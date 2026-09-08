@@ -30,7 +30,13 @@ ISSUE_NUMBER: str = os.environ.get("ISSUE_NUMBER", "1")
 ISSUE_TITLE: str = os.environ.get("ISSUE_TITLE", "")
 ISSUE_BODY: str = os.environ.get("ISSUE_BODY", "")
 
-MODEL: str = os.environ.get("OPENROUTER_MODEL", "openrouter/free")
+PRIMARY_MODEL: str = os.environ.get("OPENROUTER_MODEL", "openrouter/free")
+FALLBACK_MODELS: List[str] = [
+    PRIMARY_MODEL,
+    "google/gemini-2.5-flash:free",
+    "meta-llama/llama-3.3-70b-instruct:free",
+    "qwen/qwen-2.5-coder-32b-instruct:free"
+]
 URGENCY_THRESHOLD: int = int(os.environ.get("URGENCY_THRESHOLD", "9"))
 
 PROFILE_PATH: str = "interests.md"
@@ -67,7 +73,7 @@ def build_messages(item_text: str, profile: str) -> List[Dict[str, Any]]:
         "attention today vs. can wait for a weekly digest).\n\n"
         "Also classify it into exactly one pillar from this list:\n"
         f"{pillar_list}\n\n"
-        "Reply with only a JSON object, no other text, no markdown fences:\n"
+        "Reply with only a valid JSON object, no markdown, no quotes, no extra text:\n"
         '{"relevance": int, "novelty": int, "urgency": int, '
         '"pillar": "one of the pillar names above", '
         '"summary": "one sentence", "reason": "one sentence on the '
@@ -86,63 +92,94 @@ def extract_json(text: str) -> Dict[str, Any]:
         if "\n" in text:
             first_line, rest = text.split("\n", 1)
             text = rest if first_line.strip().lower() in ("json", "") else text
+    text = text.strip()
+    # Try finding JSON boundaries if surrounded by text
+    match = re.search(r"\{.*\}", text, re.DOTALL)
+    if match:
+        text = match.group(0)
     try:
         return json.loads(text)
     except json.JSONDecodeError as exc:
-        logging.error(f"JSON decode failed on response: {exc}")
+        logging.error(f"JSON decode failed: {exc} for text: {text[:100]}")
         return {}
 
 
 def call_openrouter(item_text: str, profile: str) -> Dict[str, Any]:
     if not OPENROUTER_API_KEY:
-        logging.warning("OPENROUTER_API_KEY missing. Using default fallback score.")
-        return get_fallback_score(item_text)
+        logging.warning("OPENROUTER_API_KEY secret is not set in repository settings.")
+        return get_fallback_score(
+            item_text,
+            "OPENROUTER_API_KEY secret is missing in repo settings. Please add OPENROUTER_API_KEY in Settings -> Secrets and variables -> Actions."
+        )
 
-    body = json.dumps(
-        {
-            "model": MODEL,
-            "messages": build_messages(item_text, profile),
-            "response_format": {"type": "json_object"},
-        }
-    ).encode()
+    unique_models = list(dict.fromkeys(FALLBACK_MODELS))
 
-    req = urllib.request.Request(
-        "https://openrouter.ai/api/v1/chat/completions",
-        data=body,
-        headers={
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            "Content-Type": "application/json",
-            "X-OpenRouter-Title": "mono-signal-os",
-        },
+    for model in unique_models:
+        logging.info(f"Attempting model scoring with: {model}")
+        for use_json_format in [True, False]:
+            payload_dict: Dict[str, Any] = {
+                "model": model,
+                "messages": build_messages(item_text, profile),
+            }
+            if use_json_format:
+                payload_dict["response_format"] = {"type": "json_object"}
+
+            body = json.dumps(payload_dict).encode()
+            req = urllib.request.Request(
+                "https://openrouter.ai/api/v1/chat/completions",
+                data=body,
+                headers={
+                    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                    "Content-Type": "application/json",
+                    "X-OpenRouter-Title": "mono-signal-os",
+                },
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=45) as resp:
+                    payload = json.load(resp)
+                if "choices" in payload and len(payload["choices"]) > 0:
+                    content = payload["choices"][0]["message"]["content"]
+                    parsed = extract_json(content)
+                    if validate_score(parsed):
+                        logging.info(f"Successfully scored with model {model}")
+                        return parsed
+            except urllib.error.HTTPError as exc:
+                logging.warning(f"HTTP {exc.code} for model {model} (json_format={use_json_format}): {exc.reason}")
+            except Exception as exc:
+                logging.warning(f"Failed model {model} (json_format={use_json_format}): {exc}")
+
+    logging.error("All OpenRouter models failed to return valid score.")
+    return get_fallback_score(
+        item_text,
+        "OpenRouter API request failed across all free models. Verify OPENROUTER_API_KEY validity and model quota."
     )
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            payload = json.load(resp)
-        content = payload["choices"][0]["message"]["content"]
-        parsed = extract_json(content)
-        if validate_score(parsed):
-            return parsed
-        logging.warning("OpenRouter payload missing required fields. Using fallback.")
-    except Exception as exc:
-        logging.error(f"OpenRouter API call failed: {exc}")
-
-    return get_fallback_score(item_text)
 
 
 def validate_score(score: Dict[str, Any]) -> bool:
     required_keys = ["relevance", "novelty", "urgency", "pillar", "summary", "reason"]
-    return all(k in score for k in required_keys) and score.get("pillar") in PILLARS
+    if not all(k in score for k in required_keys):
+        return False
+    # Validate types
+    try:
+        score["relevance"] = int(score["relevance"])
+        score["novelty"] = int(score["novelty"])
+        score["urgency"] = int(score["urgency"])
+    except (ValueError, TypeError):
+        return False
+
+    return score.get("pillar") in PILLARS
 
 
-def get_fallback_score(item_text: str) -> Dict[str, Any]:
+def get_fallback_score(item_text: str, reason_text: Optional[str] = None) -> Dict[str, Any]:
     title = item_text.split("\n")[0][:80] if item_text else "Untitled Inbox Item"
+    reason = reason_text or "Scored via fallback system due to API or parsing error."
     return {
         "relevance": 5,
         "novelty": 5,
         "urgency": 5,
         "pillar": "News & Dashboards",
         "summary": title,
-        "reason": "Scored via fallback system due to API or parsing error.",
+        "reason": reason,
     }
 
 
