@@ -4,33 +4,41 @@ Scores one inbox item (a GitHub Issue) against interests.md, pushes a
 Telegram alert if it's urgent, enriches with pillar tagging, and appends
 it to knowledge_base.jsonl as a permanent, numbered entry.
 
-Standard library only — nothing to pip install.
+Standard library only — robust, modular, and fault-tolerant.
 """
 
 import json
+import logging
 import os
 import re
 import subprocess
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
-OPENROUTER_API_KEY = os.environ["OPENROUTER_API_KEY"]
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
-ISSUE_NUMBER = os.environ["ISSUE_NUMBER"]
-ISSUE_TITLE = os.environ.get("ISSUE_TITLE", "")
-ISSUE_BODY = os.environ.get("ISSUE_BODY", "")
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(levelname)s - %(message)s",
+    datefmt="%H:%M:%S"
+)
 
-MODEL = os.environ.get("OPENROUTER_MODEL", "openrouter/free")
-URGENCY_THRESHOLD = int(os.environ.get("URGENCY_THRESHOLD", "9"))
+OPENROUTER_API_KEY: str = os.environ.get("OPENROUTER_API_KEY", "")
+TELEGRAM_BOT_TOKEN: Optional[str] = os.environ.get("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID: Optional[str] = os.environ.get("TELEGRAM_CHAT_ID")
+ISSUE_NUMBER: str = os.environ.get("ISSUE_NUMBER", "1")
+ISSUE_TITLE: str = os.environ.get("ISSUE_TITLE", "")
+ISSUE_BODY: str = os.environ.get("ISSUE_BODY", "")
 
-PROFILE_PATH = "interests.md"
-KB_PATH = "knowledge_base.jsonl"
+MODEL: str = os.environ.get("OPENROUTER_MODEL", "openrouter/free")
+URGENCY_THRESHOLD: int = int(os.environ.get("URGENCY_THRESHOLD", "9"))
+
+PROFILE_PATH: str = "interests.md"
+KB_PATH: str = "knowledge_base.jsonl"
 
 IMAGE_URL_RE = re.compile(r"!\[[^\]]*\]\((https?://[^\s)]+)\)")
 
-PILLARS = [
+PILLARS: List[str] = [
     "Financial & Market Intelligence",
     "AI / Research / AGI",
     "Saudi Economy / Urban / Labour",
@@ -39,8 +47,17 @@ PILLARS = [
     "News & Dashboards",
 ]
 
+PILLAR_EMOJI: Dict[str, str] = {
+    "Financial & Market Intelligence": "🔵",
+    "AI / Research / AGI": "🟣",
+    "Saudi Economy / Urban / Labour": "🟢",
+    "Products & Platforms": "🟠",
+    "Mobile & Infrastructure": "🔴",
+    "News & Dashboards": "🟡",
+}
 
-def build_messages(item_text: str, profile: str) -> list:
+
+def build_messages(item_text: str, profile: str) -> List[Dict[str, Any]]:
     pillar_list = "\n".join(f"  - {p}" for p in PILLARS)
     instruction = (
         "You are scoring one inbox item for a personal attention system.\n\n"
@@ -56,23 +73,31 @@ def build_messages(item_text: str, profile: str) -> list:
         '"summary": "one sentence", "reason": "one sentence on the '
         'urgency score"}\n\nItem:\n'
     )
-    content = [{"type": "text", "text": instruction + item_text}]
+    content: List[Dict[str, Any]] = [{"type": "text", "text": instruction + item_text}]
     for url in IMAGE_URL_RE.findall(item_text)[:3]:
         content.append({"type": "image_url", "image_url": {"url": url}})
     return [{"role": "user", "content": content}]
 
 
-def extract_json(text: str) -> dict:
+def extract_json(text: str) -> Dict[str, Any]:
     text = text.strip()
     if text.startswith("```"):
         text = text.strip("`")
         if "\n" in text:
             first_line, rest = text.split("\n", 1)
             text = rest if first_line.strip().lower() in ("json", "") else text
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as exc:
+        logging.error(f"JSON decode failed on response: {exc}")
+        return {}
 
 
-def call_openrouter(item_text: str, profile: str) -> dict:
+def call_openrouter(item_text: str, profile: str) -> Dict[str, Any]:
+    if not OPENROUTER_API_KEY:
+        logging.warning("OPENROUTER_API_KEY missing. Using default fallback score.")
+        return get_fallback_score(item_text)
+
     body = json.dumps(
         {
             "model": MODEL,
@@ -90,11 +115,35 @@ def call_openrouter(item_text: str, profile: str) -> dict:
             "X-OpenRouter-Title": "mono-signal-os",
         },
     )
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        payload = json.load(resp)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            payload = json.load(resp)
+        content = payload["choices"][0]["message"]["content"]
+        parsed = extract_json(content)
+        if validate_score(parsed):
+            return parsed
+        logging.warning("OpenRouter payload missing required fields. Using fallback.")
+    except Exception as exc:
+        logging.error(f"OpenRouter API call failed: {exc}")
 
-    content = payload["choices"][0]["message"]["content"]
-    return extract_json(content)
+    return get_fallback_score(item_text)
+
+
+def validate_score(score: Dict[str, Any]) -> bool:
+    required_keys = ["relevance", "novelty", "urgency", "pillar", "summary", "reason"]
+    return all(k in score for k in required_keys) and score.get("pillar") in PILLARS
+
+
+def get_fallback_score(item_text: str) -> Dict[str, Any]:
+    title = item_text.split("\n")[0][:80] if item_text else "Untitled Inbox Item"
+    return {
+        "relevance": 5,
+        "novelty": 5,
+        "urgency": 5,
+        "pillar": "News & Dashboards",
+        "summary": title,
+        "reason": "Scored via fallback system due to API or parsing error.",
+    }
 
 
 def next_id() -> int:
@@ -105,17 +154,21 @@ def next_id() -> int:
         for line in f:
             line = line.strip()
             if line:
-                last = json.loads(line)["id"]
+                try:
+                    last = json.loads(line)["id"]
+                except (json.JSONDecodeError, KeyError):
+                    continue
     return last + 1
 
 
-def append_entry(entry: dict) -> None:
+def append_entry(entry: Dict[str, Any]) -> None:
     with open(KB_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
 def send_telegram(text: str) -> None:
     if not (TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID):
+        logging.info("Telegram notification skipped (missing TOKEN or CHAT_ID)")
         return
     body = json.dumps({
         "chat_id": TELEGRAM_CHAT_ID,
@@ -129,21 +182,14 @@ def send_telegram(text: str) -> None:
     )
     try:
         urllib.request.urlopen(req, timeout=30).read()
+        logging.info("Telegram message sent successfully.")
     except urllib.error.URLError as exc:
-        print(f"Telegram send failed: {exc}")
+        logging.error(f"Telegram send failed: {exc}")
 
 
-def comment_and_close(entry_id: int, score: dict) -> None:
-    pillar = score.get("pillar", "Unknown")
-    pillar_emoji = {
-        "Financial & Market Intelligence": "🔵",
-        "AI / Research / AGI": "🟣",
-        "Saudi Economy / Urban / Labour": "🟢",
-        "Products & Platforms": "🟠",
-        "Mobile & Infrastructure": "🔴",
-        "News & Dashboards": "🟡",
-    }
-    emoji = pillar_emoji.get(pillar, "⚪")
+def comment_and_close(entry_id: int, score: Dict[str, Any]) -> None:
+    pillar = score.get("pillar", "News & Dashboards")
+    emoji = PILLAR_EMOJI.get(pillar, "⚪")
 
     comment = (
         f"Filed as entry **#{entry_id}** {emoji} {pillar}\n\n"
@@ -155,21 +201,21 @@ def comment_and_close(entry_id: int, score: dict) -> None:
         f"**Summary:** {score['summary']}\n\n"
         f"**Reason:** {score['reason']}"
     )
-    subprocess.run(
-        ["gh", "issue", "comment", ISSUE_NUMBER, "--body", comment], check=True
-    )
-    # Add pillar label
-    label = f"pillar:{pillar}"
-    subprocess.run(
-        ["gh", "issue", "edit", ISSUE_NUMBER, "--add-label", label],
-        check=False,  # Label may not exist yet
-    )
-    subprocess.run(["gh", "issue", "close", ISSUE_NUMBER], check=True)
+    try:
+        subprocess.run(["gh", "issue", "comment", ISSUE_NUMBER, "--body", comment], check=True)
+        label = f"pillar:{pillar}"
+        subprocess.run(["gh", "issue", "edit", ISSUE_NUMBER, "--add-label", label], check=False)
+        subprocess.run(["gh", "issue", "close", ISSUE_NUMBER], check=True)
+        logging.info(f"GitHub issue #{ISSUE_NUMBER} updated and closed.")
+    except subprocess.CalledProcessError as e:
+        logging.error(f"GitHub CLI operation failed: {e}")
 
 
 def main() -> None:
-    with open(PROFILE_PATH, "r", encoding="utf-8") as f:
-        profile = f.read()
+    profile = ""
+    if os.path.exists(PROFILE_PATH):
+        with open(PROFILE_PATH, "r", encoding="utf-8") as f:
+            profile = f.read()
 
     item_text = f"{ISSUE_TITLE}\n\n{ISSUE_BODY}".strip()
     score = call_openrouter(item_text, profile)
@@ -179,7 +225,7 @@ def main() -> None:
         "id": entry_id,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "issue_number": ISSUE_NUMBER,
-        "pillar": score.get("pillar", "Unknown"),
+        "pillar": score.get("pillar", "News & Dashboards"),
         "content": item_text,
         "relevance": score["relevance"],
         "novelty": score["novelty"],
@@ -188,9 +234,10 @@ def main() -> None:
         "reason": score["reason"],
     }
     append_entry(entry)
+    logging.info(f"Entry #{entry_id} recorded in knowledge base.")
 
     if score["urgency"] >= URGENCY_THRESHOLD:
-        pillar = score.get("pillar", "Unknown")
+        pillar = score.get("pillar", "News & Dashboards")
         msg = (
             f"🚨 <b>INTERRUPT #{entry_id}</b>\n"
             f"<b>Pillar:</b> {pillar}\n"
@@ -200,7 +247,7 @@ def main() -> None:
         )
         send_telegram(msg)
     elif score["urgency"] >= 5:
-        pillar = score.get("pillar", "Unknown")
+        pillar = score.get("pillar", "News & Dashboards")
         msg = (
             f"📋 <b>#{entry_id}</b> — {pillar}\n"
             f"Score: {score['urgency']}/10\n"

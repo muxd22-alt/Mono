@@ -63,12 +63,43 @@ change a line here and every future score reflects it immediately.
 - Intelligence pipeline architecture patterns, news aggregation
   at scale, automated OSINT.
 
+## What counts as a breakthrough (vs. routine)
+
+This is what the scorer checks "novelty" against. Vague relevance is
+not enough — score novelty high only when the item clears the bar
+below for its category, and low when it's a routine restatement of
+something already known.
+
+- **Financial & market**: a spread, correlation, or volatility level
+  breaking a multi-year pattern; a rate surprise vs. consensus. Not:
+  routine daily moves, expected earnings, expected rate decisions.
+- **AI / research / AGI**: a capability that didn't exist last month —
+  a benchmark broken by a wide margin, a lab claiming a genuine first,
+  AGI/ASI used by a source that's never used it before. Not: another
+  incremental model release, another post restating known ideas.
+- **Saudi economy / urban / labour**: an actual policy change, not a
+  policy discussion; a number breaking a multi-year trend. Not:
+  routine indicator releases in line with expectations.
+- **Products & platforms**: a pattern or tool you haven't seen
+  implemented before, or one that solves your exact problem. Not:
+  another tutorial on something you already know.
+- **Mobile & infrastructure**: a way to do something on your stack
+  (Termux, mesh networking) that was previously painful or impossible.
+  Not: an incremental version bump.
+- **News & geopolitics**: an event that changes the odds of a
+  market-moving outcome. Not: continuation of an already-priced-in
+  situation.
+
 ## Scoring guidance
 
 - Urgency 9-10: actionable today — a signal that would change a
   decision if you saw it tomorrow instead of now.
 - Urgency 5-8: worth reading, fits a daily digest, not time-critical.
 - Urgency 1-4: tangential or already-known — low relevance or novelty.
+- Novelty is graded against the breakthrough bar above, and also
+  against what's already been filed recently (the scorer shows the
+  model your last ~15 entries so it doesn't re-flag the same thing
+  as a breakthrough twice).
 
 Edit the themes above freely. Nothing else in the pipeline needs to
 change when you do.
