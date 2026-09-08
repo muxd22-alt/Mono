@@ -4,24 +4,29 @@ Scans both GitHub accounts (muxd22-alt and Muxd21), enriches each repo
 with metadata, classifies into pillars, and writes repos.json for the
 dashboard. Runs daily via GitHub Actions.
 
-Standard library only.
+Standard library only — clean, modular, and resilient.
 """
 
 import json
+import logging
 import os
-import urllib.request
+import time
 import urllib.error
+import urllib.request
 from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
-GH_TOKEN = os.environ.get("GH_PAT", os.environ.get("GH_TOKEN", ""))
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(levelname)s - %(message)s",
+    datefmt="%H:%M:%S"
+)
 
-ACCOUNTS = ["muxd22-alt", "Muxd21"]
+GH_TOKEN: str = os.environ.get("GH_PAT", os.environ.get("GH_TOKEN", ""))
+ACCOUNTS: List[str] = ["muxd22-alt", "Muxd21"]
+OUTPUT_PATH: str = "data/repos.json"
 
-OUTPUT_PATH = "data/repos.json"
-
-# ── Repo → Pillar mapping ──────────────────────────────────────────
-
-PILLAR_MAP = {
+PILLAR_MAP: Dict[str, str] = {
     # 🔵 Financial & Market Intelligence
     "SectorShift": "financial",
     "TASI-Quant-Replicator": "financial",
@@ -88,8 +93,7 @@ PILLAR_MAP = {
     "agent-os": "news",
 }
 
-# Dismissed repos (games, trivial forks, tests, duplicates)
-DISMISSED = {
+DISMISSED: set = {
     "N-r", "fay", "cesium-unity", "unity-roadmap", "post-labour-tracker",
     "https-github.com-muxd22-alt-hud_live", "claude-code-rev",
     "yt-bot-history", "youBOT", "Auto", "r3r4", "STUPID_2", "open2a",
@@ -99,7 +103,7 @@ DISMISSED = {
     "pdf-chat-agent", "map-widget", "all_promot",
 }
 
-PILLAR_META = {
+PILLAR_META: Dict[str, Dict[str, str]] = {
     "financial": {
         "name": "Financial & Market Intelligence",
         "emoji": "🔵",
@@ -133,7 +137,7 @@ PILLAR_META = {
 }
 
 
-def build_github_headers() -> dict:
+def build_github_headers() -> Dict[str, str]:
     headers = {
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
@@ -144,58 +148,70 @@ def build_github_headers() -> dict:
     return headers
 
 
-def fetch_repos(username: str) -> list:
+def make_request_with_retry(url: str, max_retries: int = 3, backoff_factor: float = 1.0) -> Optional[Any]:
+    req = urllib.request.Request(url, headers=build_github_headers())
+    for attempt in range(1, max_retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return json.load(resp)
+        except urllib.error.HTTPError as e:
+            if e.code in (403, 429) and attempt < max_retries:
+                sleep_time = backoff_factor * (2 ** (attempt - 1))
+                logging.warning(f"Rate limited on {url}. Retrying in {sleep_time:.1f}s...")
+                time.sleep(sleep_time)
+            else:
+                logging.error(f"HTTP error {e.code} fetching {url}: {e.reason}")
+                break
+        except urllib.error.URLError as e:
+            logging.error(f"URL error fetching {url}: {e.reason}")
+            break
+        except Exception as e:
+            logging.error(f"Unexpected error fetching {url}: {e}")
+            break
+    return None
+
+
+def fetch_repos(username: str) -> List[Dict[str, Any]]:
     """Fetch all public+private repos for a user via GitHub API."""
-    repos = []
+    repos: List[Dict[str, Any]] = []
     page = 1
     while True:
         url = (
             f"https://api.github.com/users/{username}/repos"
             f"?per_page=100&page={page}&sort=updated"
         )
-        req = urllib.request.Request(url, headers=build_github_headers())
-        try:
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                batch = json.load(resp)
-        except urllib.error.HTTPError as e:
-            print(f"Error fetching {username} page {page}: {e}")
-            break
-
-        if not batch:
+        batch = make_request_with_retry(url)
+        if not batch or not isinstance(batch, list):
             break
         repos.extend(batch)
         page += 1
     return repos
 
 
-def fetch_open_issues(owner: str, repo: str, limit: int = 5) -> list:
+def fetch_open_issues(owner: str, repo: str, limit: int = 5) -> List[Dict[str, Any]]:
     """Fetch recent open issues for a repo."""
     url = (
         f"https://api.github.com/repos/{owner}/{repo}/issues"
         f"?state=open&per_page={limit}&sort=updated"
     )
-    req = urllib.request.Request(url, headers=build_github_headers())
-    try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            return json.load(resp)
-    except (urllib.error.HTTPError, urllib.error.URLError):
+    issues = make_request_with_retry(url)
+    if not issues or not isinstance(issues, list):
         return []
+    return issues
 
 
-def enrich_repo(raw: dict, account: str) -> dict | None:
+def enrich_repo(raw: Dict[str, Any], account: str) -> Optional[Dict[str, Any]]:
     """Transform raw GitHub API repo data into enriched format."""
-    name = raw["name"]
-
-    if name in DISMISSED:
+    name = raw.get("name", "")
+    if not name or name in DISMISSED:
         return None
 
     pillar_key = PILLAR_MAP.get(name)
     if not pillar_key:
-        return None  # Not in any pillar → skip
+        return None
 
     pillar = PILLAR_META[pillar_key]
 
-    # Fetch recent issues
     issues = fetch_open_issues(account, name, limit=3)
     issue_data = [
         {
@@ -206,15 +222,15 @@ def enrich_repo(raw: dict, account: str) -> dict | None:
             "labels": [l["name"] for l in i.get("labels", [])],
         }
         for i in issues
-        if not i.get("pull_request")  # Exclude PRs
+        if isinstance(i, dict) and not i.get("pull_request")
     ]
 
     return {
         "name": name,
-        "full_name": raw["full_name"],
+        "full_name": raw.get("full_name", f"{account}/{name}"),
         "account": account,
         "description": raw.get("description") or "",
-        "url": raw["html_url"],
+        "url": raw.get("html_url", f"https://github.com/{account}/{name}"),
         "language": raw.get("language") or "Unknown",
         "stars": raw.get("stargazers_count", 0),
         "forks": raw.get("forks_count", 0),
@@ -233,18 +249,17 @@ def enrich_repo(raw: dict, account: str) -> dict | None:
 
 
 def main() -> None:
-    all_repos = []
+    all_repos: List[Dict[str, Any]] = []
     for account in ACCOUNTS:
-        print(f"Fetching repos for {account}...")
+        logging.info(f"Fetching repos for {account}...")
         raw_repos = fetch_repos(account)
-        print(f"  Found {len(raw_repos)} repos")
+        logging.info(f"  Found {len(raw_repos)} raw repos for {account}")
         for raw in raw_repos:
             enriched = enrich_repo(raw, account)
             if enriched:
                 all_repos.append(enriched)
 
-    # Deduplicate by name (keep the one updated most recently)
-    seen = {}
+    seen: Dict[str, Dict[str, Any]] = {}
     for repo in all_repos:
         name = repo["name"]
         if name not in seen or repo["updated_at"] > seen[name]["updated_at"]:
@@ -262,10 +277,10 @@ def main() -> None:
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
-    print(f"\nWrote {len(deduped)} repos to {OUTPUT_PATH}")
+    logging.info(f"Successfully wrote {len(deduped)} repos to {OUTPUT_PATH}")
     for key, meta in PILLAR_META.items():
         count = sum(1 for r in deduped if r["pillar"] == key)
-        print(f"  {meta['emoji']} {meta['name']}: {count}")
+        logging.info(f"  {meta['emoji']} {meta['name']}: {count}")
 
 
 if __name__ == "__main__":

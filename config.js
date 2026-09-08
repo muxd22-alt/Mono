@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 window.MONO_CONFIG = {
-    defaultRepo: "muxd22-alt/Mono",
+    defaultRepo: "muxd22-alt/Signal-OS",
     accounts: ["muxd22-alt", "Muxd21"],
     pillars: {
         financial: { name: "Financial & Market Intelligence", emoji: "🔵", color: "#3B82F6" },

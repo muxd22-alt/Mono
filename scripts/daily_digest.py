@@ -3,40 +3,55 @@
 Generates the daily digest from knowledge_base.jsonl and recent repo
 activity. Outputs data/digest.json for the dashboard.
 
-Standard library only.
+Standard library only — clean, modular, and typed.
 """
 
 import json
+import logging
 import os
 from datetime import datetime, timezone, timedelta
+from typing import Any, Dict, List
 
-KB_PATH = "knowledge_base.jsonl"
-REPOS_PATH = "data/repos.json"
-OUTPUT_PATH = "data/digest.json"
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] %(levelname)s - %(message)s",
+    datefmt="%H:%M:%S"
+)
+
+KB_PATH: str = "knowledge_base.jsonl"
+REPOS_PATH: str = "data/repos.json"
+OUTPUT_PATH: str = "data/digest.json"
 
 
-def load_kb() -> list:
-    """Load all knowledge base entries."""
+def load_kb() -> List[Dict[str, Any]]:
+    """Load all knowledge base entries safely."""
     if not os.path.exists(KB_PATH):
         return []
-    entries = []
+    entries: List[Dict[str, Any]] = []
     with open(KB_PATH, "r", encoding="utf-8") as f:
-        for line in f:
+        for line_num, line in enumerate(f, 1):
             line = line.strip()
             if line:
-                entries.append(json.loads(line))
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError as err:
+                    logging.warning(f"Skipping malformed line {line_num} in {KB_PATH}: {err}")
     return entries
 
 
-def load_repos() -> dict:
-    """Load enriched repos data."""
+def load_repos() -> Dict[str, Any]:
+    """Load enriched repos data safely."""
     if not os.path.exists(REPOS_PATH):
         return {"repos": [], "pillars": {}}
-    with open(REPOS_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(REPOS_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as err:
+        logging.error(f"Error loading {REPOS_PATH}: {err}")
+        return {"repos": [], "pillars": {}}
 
 
-def generate_digest() -> dict:
+def generate_digest() -> Dict[str, Any]:
     kb = load_kb()
     repos_data = load_repos()
 
@@ -44,51 +59,43 @@ def generate_digest() -> dict:
     cutoff_24h = (now - timedelta(hours=24)).isoformat()
     cutoff_7d = (now - timedelta(days=7)).isoformat()
 
-    # Recent KB entries
     recent_24h = [e for e in kb if e.get("timestamp", "") >= cutoff_24h]
     recent_7d = [e for e in kb if e.get("timestamp", "") >= cutoff_7d]
 
-    # Sort by urgency desc
     recent_24h.sort(key=lambda e: e.get("urgency", 0), reverse=True)
     recent_7d.sort(key=lambda e: e.get("urgency", 0), reverse=True)
 
-    # Pillar stats from KB
-    pillar_counts = {}
+    pillar_counts: Dict[str, int] = {}
     for e in kb:
         p = e.get("pillar", "Unknown")
         pillar_counts[p] = pillar_counts.get(p, 0) + 1
 
-    # Today's interrupt items (urgency >= 9)
     interrupts = [e for e in recent_24h if e.get("urgency", 0) >= 9]
-
-    # Today's watch items (urgency 5-8)
     watch = [e for e in recent_24h if 5 <= e.get("urgency", 0) <= 8]
 
-    # Repos with recent activity (pushed in last 24h)
-    active_repos = []
+    active_repos: List[Dict[str, Any]] = []
     for r in repos_data.get("repos", []):
         if r.get("pushed_at", "") >= cutoff_24h:
             active_repos.append({
-                "name": r["name"],
-                "pillar": r["pillar"],
-                "pillar_emoji": r["pillar_emoji"],
-                "pushed_at": r["pushed_at"],
-                "url": r["url"],
+                "name": r.get("name", ""),
+                "pillar": r.get("pillar", ""),
+                "pillar_emoji": r.get("pillar_emoji", "⚪"),
+                "pushed_at": r.get("pushed_at", ""),
+                "url": r.get("url", ""),
             })
 
-    # Repos with recent activity (pushed in last 7 days)
-    weekly_repos = []
+    weekly_repos: List[Dict[str, Any]] = []
     for r in repos_data.get("repos", []):
         if r.get("pushed_at", "") >= cutoff_7d:
             weekly_repos.append({
-                "name": r["name"],
-                "pillar": r["pillar"],
-                "pillar_emoji": r["pillar_emoji"],
-                "pushed_at": r["pushed_at"],
-                "url": r["url"],
+                "name": r.get("name", ""),
+                "pillar": r.get("pillar", ""),
+                "pillar_emoji": r.get("pillar_emoji", "⚪"),
+                "pushed_at": r.get("pushed_at", ""),
+                "url": r.get("url", ""),
             })
 
-    digest = {
+    digest: Dict[str, Any] = {
         "generated_at": now.isoformat(),
         "stats": {
             "total_entries": len(kb),
@@ -109,8 +116,11 @@ def generate_digest() -> dict:
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump(digest, f, indent=2, ensure_ascii=False)
 
-    print(f"Digest generated: {len(interrupts)} interrupts, "
-          f"{len(watch)} watch items, {len(active_repos)} active repos")
+    logging.info(
+        f"Digest generated: {len(interrupts)} interrupts, "
+        f"{len(watch)} watch items, {len(active_repos)} active repos"
+    )
+    return digest
 
 
 if __name__ == "__main__":
