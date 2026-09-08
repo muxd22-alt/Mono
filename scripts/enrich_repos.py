@@ -133,6 +133,17 @@ PILLAR_META = {
 }
 
 
+def build_github_headers() -> dict:
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "Mono-Signal-OS",
+    }
+    if GH_TOKEN:
+        headers["Authorization"] = f"Bearer {GH_TOKEN}"
+    return headers
+
+
 def fetch_repos(username: str) -> list:
     """Fetch all public+private repos for a user via GitHub API."""
     repos = []
@@ -142,11 +153,7 @@ def fetch_repos(username: str) -> list:
             f"https://api.github.com/users/{username}/repos"
             f"?per_page=100&page={page}&sort=updated"
         )
-        req = urllib.request.Request(url, headers={
-            "Authorization": f"Bearer {GH_TOKEN}",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-        })
+        req = urllib.request.Request(url, headers=build_github_headers())
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 batch = json.load(resp)
@@ -167,11 +174,7 @@ def fetch_open_issues(owner: str, repo: str, limit: int = 5) -> list:
         f"https://api.github.com/repos/{owner}/{repo}/issues"
         f"?state=open&per_page={limit}&sort=updated"
     )
-    req = urllib.request.Request(url, headers={
-        "Authorization": f"Bearer {GH_TOKEN}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    })
+    req = urllib.request.Request(url, headers=build_github_headers())
     try:
         with urllib.request.urlopen(req, timeout=15) as resp:
             return json.load(resp)

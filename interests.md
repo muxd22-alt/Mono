@@ -1,74 +1,67 @@
 # Interest Profile — Mono Signal OS
 
-This is the only file you should need to hand-edit as your interests shift.
-The scorer reads it on every run and judges new inbox items against it —
-change a line here and every future score reflects it immediately.
+This is the central interest definition for the Mono Signal OS pipeline.
+The scorer reads this on every run and evaluates new inbox items against it.
+Edit these sections freely to adjust signal detection thresholds across all 6 core pillars.
+
+---
 
 ## 🔵 Financial & Market Intelligence
 
-- Early signals of stock market stress or crashes: unusual volatility,
-  credit spread widening, forced-selling patterns, correlated drawdowns
-  across asset classes.
-- TASI (Saudi stock market) movements, sector rotations, and quant
-  signals — anything that would affect the TASI Quant Replicator.
-- Economic cycle turns relevant to timing decisions: rate-cut or
-  rate-hike signals, yield curve moves, anything that would change
-  a buy / sell / DCA decision on stocks or crypto.
-- Crypto regime shifts: Bitcoin halving cycle effects, liquidity
-  expansions, regulatory moves, on-chain anomalies.
-- SAMA (Saudi Central Bank) policy: DBR changes, restructuring rules,
-  mortgage regulation shifts.
+- **Crash & Stress Detection**: Early signals of stock market stress or structural fragility (e.g. forced liquidations, credit spread widening, unusual derivative volatility, cross-asset drawdowns).
+- **TASI & Saudi Markets**: Saudi stock exchange (TASI) movements, liquidity shifts, sector rotations, and algorithmic quant signals affecting the TASI Quant Replicator models.
+- **Macroeconomic Policy & Cycles**: Federal Reserve, ECB, and SAMA (Saudi Central Bank) monetary policy, interest rate shifts, yield curve shifts, Debt Burden Ratio (DBR) changes, and mortgage market regulatory updates.
+- **Crypto & Digital Assets**: Regime shifts in Bitcoin/Ethereum, liquidity expansions, ETF flows, stablecoin regulation, and on-chain anomaly detection.
+- **Quant & Systematic Trading**: Alpha models, automated backtesting frameworks, and high-frequency risk management pipelines.
+
+---
 
 ## 🟣 AI / Research / AGI
 
-- The word "AGI" or "ASI" appearing in a new context: a paper, a lab
-  announcement, a policy document, or a shift in how often it shows up
-  in arXiv abstracts or mainstream coverage.
-- Breakthroughs in agentic AI: new agent frameworks, tool-use
-  capabilities, autonomous coding, multi-agent orchestration.
-- AI model releases that change the capability frontier: new reasoning
-  models, multimodal systems, open-weight releases.
-- Bioinformatics + AI intersections relevant to ClawBio.
+- **AGI / ASI Trajectory**: Emerging papers, frontier lab announcements (OpenAI, Anthropic, DeepMind, etc.), compute scaling laws, and benchmarks tracking artificial general intelligence.
+- **Agentic Systems**: Autonomous coding agents, tool-use orchestration frameworks, multi-agent communication protocols, and execution sandboxes.
+- **Frontier AI Models**: Reasoning models, multimodal architectures, open-weight model releases (Llama, DeepSeek, Mistral), and model quantization/distillation.
+- **Bioinformatics & AI**: Applications of ML to biological sequence analysis, protein folding, structural biology, and computational health (ClawBio integration).
+
+---
 
 ## 🟢 Saudi Economy / Urban / Labour
 
-- Employment and AI intersecting: layoffs attributed to automation,
-  hiring freezes in roles exposed to AI tooling, new benchmarks on
-  job displacement.
-- Saudi Vision 2030 economic indicators, urban heat island data,
-  post-labour economy signals.
-- Agricultural technology and food security developments in the
-  Gulf region.
+- **Labour & AI Displacement**: Employment trends across the Gulf region, automation-driven displacement metrics, hiring freezes in tech/finance, and retraining policies.
+- **Saudi Vision 2030 Transformation**: Key indicators for giga-projects, urban infrastructure growth, foreign direct investment (FDI), and non-oil GDP statistics.
+- **Urban Environment & Climate Tech**: Urban Heat Island (UHI) mapping, microclimate monitoring, arid-land agricultural technology, and regional food security developments.
+- **Post-Labour Economy**: Theoretical and empirical signals regarding universal basic income, post-scarcity economic models, and automated public services.
+
+---
 
 ## 🟠 Products & Platforms
 
-- Hudhud platform developments, PWA best practices, service worker
-  patterns for offline-first apps.
-- New approaches to personal AI assistants (moltis, PAI), local-first
-  AI, Rust-based systems.
-- Telegram bot frameworks and conversational AI patterns.
+- **Hudhud Platform**: PWA architecture, service worker caching, offline-first sync strategies, and real-time dashboard visualization techniques.
+- **Personal AI Assistants (PAI / Moltis)**: Local-first AI infrastructure, zero-latency inference UX, privacy-preserving state management, and conversational interfaces.
+- **Telegram & Bot Interfaces**: Custom bot frameworks, webhook handlers, Telegram Mini App integrations, and rich messaging UX patterns.
+- **Product Strategy & Design**: Minimalist design systems, command-palette interfaces, and low-friction workflow tools.
+
+---
 
 ## 🔴 Mobile & Infrastructure
 
-- Termux / Android native development breakthroughs, proot-free
-  approaches, single-binary deployments.
-- Mesh networking, peer-to-peer VPN, DNS sinkhole ad-blocking
-  advances.
-- Edge computing and on-device ML inference.
+- **Android & Termux Native**: Proot-free Linux environments on Android, native execution pipelines, single-binary cross-compilation, and mobile terminal orchestration.
+- **Networking & Security**: Mesh networking (Tailscale, WireGuard), P2P overlay networks, DNS sinkholes (Pi-hole/AdGuard), and edge firewall architectures.
+- **Edge Computing**: On-device neural network inference, WebGPU acceleration, lightweight containerization, and low-power hardware deployments.
+- **VPS & Cloud Infra**: Minimal Debian/Ubuntu VPS configurations, automated deployment scripts, and self-hosted service telemetry.
+
+---
 
 ## 🟡 News & Dashboards
 
-- Geopolitical signals that affect markets: energy policy, trade
-  tensions, sanctions, regional conflicts.
-- Intelligence pipeline architecture patterns, news aggregation
-  at scale, automated OSINT.
+- **Geopolitical Signal Intelligence**: Energy market dynamics, Gulf geopolitics, international trade corridors, supply chain disruptions, and macro sanctions tracking.
+- **Automated OSINT & Intelligence**: Real-time news aggregation engines, RSS filtering pipelines, scraping resilience, and semantic deduplication algorithms.
+- **Signal Filtering & Operations**: Dashboard design for low signal-to-noise ratio data streams, priority queue visualization, and real-time alert dispatching.
+
+---
 
 ## Scoring guidance
 
-- Urgency 9-10: actionable today — a signal that would change a
-  decision if you saw it tomorrow instead of now.
-- Urgency 5-8: worth reading, fits a daily digest, not time-critical.
-- Urgency 1-4: tangential or already-known — low relevance or novelty.
-
-Edit the themes above freely. Nothing else in the pipeline needs to
-change when you do.
+- **Urgency 9–10 (Interrupt)**: Immediate actionable alert. Significant market stress, critical system breakdown, or game-changing frontier AI release requiring immediate attention.
+- **Urgency 5–8 (Watch)**: Relevant, noteworthy update. Fits into the daily digest for structured review.
+- **Urgency 1–4 (Ignore / Archive)**: Tangential, redundant, or low-relevance signal with minimal impact.
