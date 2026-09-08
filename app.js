@@ -6,7 +6,8 @@
     "use strict";
 
     // ── Config ──
-    const DEFAULT_REPO = "muxd22-alt/Mono";
+    const CONFIG = window.MONO_CONFIG || {};
+    const DEFAULT_REPO = CONFIG.defaultRepo || "muxd22-alt/Signal-OS";
     const PILLAR_META = {
         financial: { name: "Financial & Market Intelligence", emoji: "🔵", color: "#3B82F6" },
         ai: { name: "AI / Research / AGI", emoji: "🟣", color: "#A855F7" },
