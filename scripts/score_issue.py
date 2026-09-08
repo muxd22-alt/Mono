@@ -93,7 +93,6 @@ def extract_json(text: str) -> Dict[str, Any]:
             first_line, rest = text.split("\n", 1)
             text = rest if first_line.strip().lower() in ("json", "") else text
     text = text.strip()
-    # Try finding JSON boundaries if surrounded by text
     match = re.search(r"\{.*\}", text, re.DOTALL)
     if match:
         text = match.group(0)
@@ -159,7 +158,6 @@ def validate_score(score: Dict[str, Any]) -> bool:
     required_keys = ["relevance", "novelty", "urgency", "pillar", "summary", "reason"]
     if not all(k in score for k in required_keys):
         return False
-    # Validate types
     try:
         score["relevance"] = int(score["relevance"])
         score["novelty"] = int(score["novelty"])

@@ -1,44 +1,85 @@
 {
-  "generated_at": "2026-09-08T10:35:57.808105+00:00",
+  "generated_at": "2026-09-08T10:59:34.210454+00:00",
   "stats": {
-    "total_entries": 0,
-    "last_24h": 0,
-    "last_7d": 0,
-    "pillar_counts": {},
+    "total_entries": 1,
+    "last_24h": 1,
+    "last_7d": 1,
+    "pillar_counts": {
+      "News & Dashboards": 1
+    },
     "total_repos": 49
   },
   "interrupts": [],
-  "watch": [],
-  "recent_entries": [],
-  "weekly_entries": [],
-  "active_repos_24h": [
+  "watch": [
     {
-      "name": "SectorShift",
-      "pillar": "financial",
-      "pillar_emoji": "🔵",
-      "pushed_at": "2026-09-08T08:28:47Z",
-      "url": "https://github.com/muxd22-alt/SectorShift"
-    },
+      "id": 1,
+      "timestamp": "2026-09-08T10:42:52.565816+00:00",
+      "issue_number": "5",
+      "pillar": "News & Dashboards",
+      "content": "Signal OS\n\n# Interest Profile — Mono Signal OS\n\nThis is the only file you should need to hand-edit as your interests shift.\nThe scorer reads it on every run and judges new inbox items against it —\nchange a line here and every future score reflects it immediately.\n\n## 🔵 Financial & Market Intelligence\n\n- Early signals of stock market stress or crashes: unusual volatility,\n  credit spread widening, forced-selling patterns, correlated drawdowns\n  across asset classes.\n- TASI (Saudi stock market) movements, sector rotations, and quant\n  signals — anything that would affect the TASI Quant Replicator.\n- Economic cycle turns relevant to timing decisions: rate-cut or\n  rate-hike signals, yield curve moves, anything that would change\n  a buy / sell / DCA decision on stocks or crypto.\n- Crypto regime shifts: Bitcoin halving cycle effects, liquidity\n  expansions, regulatory moves, on-chain anomalies.\n- SAMA (Saudi Central Bank) policy: DBR changes, restructuring rules,\n  mortgage regulation shifts.\n\n## 🟣 AI / Research / AGI\n\n- The word \"AGI\" or \"ASI\" appearing in a new context: a paper, a lab\n  announcement, a policy document, or a shift in how often it shows up\n  in arXiv abstracts or mainstream coverage.\n- Breakthroughs in agentic AI: new agent frameworks, tool-use\n  capabilities, autonomous coding, multi-agent orchestration.\n- AI model releases that change the capability frontier: new reasoning\n  models, multimodal systems, open-weight releases.\n- Bioinformatics + AI intersections relevant to ClawBio.\n\n## 🟢 Saudi Economy / Urban / Labour\n\n- Employment and AI intersecting: layoffs attributed to automation,\n  hiring freezes in roles exposed to AI tooling, new benchmarks on\n  job displacement.\n- Saudi Vision 2030 economic indicators, urban heat island data,\n  post-labour economy signals.\n- Agricultural technology and food security developments in the\n  Gulf region.\n\n## 🟠 Products & Platforms\n\n- Hudhud platform developments, PWA best practices, service worker\n  patterns for offline-first apps.\n- New approaches to personal AI assistants (moltis, PAI), local-first\n  AI, Rust-based systems.\n- Telegram bot frameworks and conversational AI patterns.\n\n## 🔴 Mobile & Infrastructure\n\n- Termux / Android native development breakthroughs, proot-free\n  approaches, single-binary deployments.\n- Mesh networking, peer-to-peer VPN, DNS sinkhole ad-blocking\n  advances.\n- Edge computing and on-device ML inference.\n\n## 🟡 News & Dashboards\n\n- Geopolitical signals that affect markets: energy policy, trade\n  tensions, sanctions, regional conflicts.\n- Intelligence pipeline architecture patterns, news aggregation\n  at scale, automated OSINT.\n\n## What counts as a breakthrough (vs. routine)\n\nThis is what the scorer checks \"novelty\" against. Vague relevance is\nnot enough — score novelty high only when the item clears the bar\nbelow for its category, and low when it's a routine restatement of\nsomething already known.\n\n- **Financial & market**: a spread, correlation, or volatility level\n  breaking a multi-year pattern; a rate surprise vs. consensus. Not:\n  routine daily moves, expected earnings, expected rate decisions.\n- **AI / research / AGI**: a capability that didn't exist last month —\n  a benchmark broken by a wide margin, a lab claiming a genuine first,\n  AGI/ASI used by a source that's never used it before. Not: another\n  incremental model release, another post restating known ideas.\n- **Saudi economy / urban / labour**: an actual policy change, not a\n  policy discussion; a number breaking a multi-year trend. Not:\n  routine indicator releases in line with expectations.\n- **Products & platforms**: a pattern or tool you haven't seen\n  implemented before, or one that solves your exact problem. Not:\n  another tutorial on something you already know.\n- **Mobile & infrastructure**: a way to do something on your stack\n  (Termux, mesh networking) that was previously painful or impossible.\n  Not: an incremental version bump.\n- **News & geopolitics**: an event that changes the odds of a\n  market-moving outcome. Not: continuation of an already-priced-in\n  situation.\n\n## Scoring guidance\n\n- Urgency 9-10: actionable today — a signal that would change a\n  decision if you saw it tomorrow instead of now.\n- Urgency 5-8: worth reading, fits a daily digest, not time-critical.\n- Urgency 1-4: tangential or already-known — low relevance or novelty.\n- Novelty is graded against the breakthrough bar above, and also\n  against what's already been filed recently (the scorer shows the\n  model your last ~15 entries so it doesn't re-flag the same thing\n  as a breakthrough twice).\n\nEdit the themes above freely. Nothing else in the pipeline needs to\nchange when you do.",
+      "relevance": 5,
+      "novelty": 5,
+      "urgency": 5,
+      "summary": "Signal OS",
+      "reason": "Scored via fallback system due to API or parsing error."
+    }
+  ],
+  "recent_entries": [
+    {
+      "id": 1,
+      "timestamp": "2026-09-08T10:42:52.565816+00:00",
+      "issue_number": "5",
+      "pillar": "News & Dashboards",
+      "content": "Signal OS\n\n# Interest Profile — Mono Signal OS\n\nThis is the only file you should need to hand-edit as your interests shift.\nThe scorer reads it on every run and judges new inbox items against it —\nchange a line here and every future score reflects it immediately.\n\n## 🔵 Financial & Market Intelligence\n\n- Early signals of stock market stress or crashes: unusual volatility,\n  credit spread widening, forced-selling patterns, correlated drawdowns\n  across asset classes.\n- TASI (Saudi stock market) movements, sector rotations, and quant\n  signals — anything that would affect the TASI Quant Replicator.\n- Economic cycle turns relevant to timing decisions: rate-cut or\n  rate-hike signals, yield curve moves, anything that would change\n  a buy / sell / DCA decision on stocks or crypto.\n- Crypto regime shifts: Bitcoin halving cycle effects, liquidity\n  expansions, regulatory moves, on-chain anomalies.\n- SAMA (Saudi Central Bank) policy: DBR changes, restructuring rules,\n  mortgage regulation shifts.\n\n## 🟣 AI / Research / AGI\n\n- The word \"AGI\" or \"ASI\" appearing in a new context: a paper, a lab\n  announcement, a policy document, or a shift in how often it shows up\n  in arXiv abstracts or mainstream coverage.\n- Breakthroughs in agentic AI: new agent frameworks, tool-use\n  capabilities, autonomous coding, multi-agent orchestration.\n- AI model releases that change the capability frontier: new reasoning\n  models, multimodal systems, open-weight releases.\n- Bioinformatics + AI intersections relevant to ClawBio.\n\n## 🟢 Saudi Economy / Urban / Labour\n\n- Employment and AI intersecting: layoffs attributed to automation,\n  hiring freezes in roles exposed to AI tooling, new benchmarks on\n  job displacement.\n- Saudi Vision 2030 economic indicators, urban heat island data,\n  post-labour economy signals.\n- Agricultural technology and food security developments in the\n  Gulf region.\n\n## 🟠 Products & Platforms\n\n- Hudhud platform developments, PWA best practices, service worker\n  patterns for offline-first apps.\n- New approaches to personal AI assistants (moltis, PAI), local-first\n  AI, Rust-based systems.\n- Telegram bot frameworks and conversational AI patterns.\n\n## 🔴 Mobile & Infrastructure\n\n- Termux / Android native development breakthroughs, proot-free\n  approaches, single-binary deployments.\n- Mesh networking, peer-to-peer VPN, DNS sinkhole ad-blocking\n  advances.\n- Edge computing and on-device ML inference.\n\n## 🟡 News & Dashboards\n\n- Geopolitical signals that affect markets: energy policy, trade\n  tensions, sanctions, regional conflicts.\n- Intelligence pipeline architecture patterns, news aggregation\n  at scale, automated OSINT.\n\n## What counts as a breakthrough (vs. routine)\n\nThis is what the scorer checks \"novelty\" against. Vague relevance is\nnot enough — score novelty high only when the item clears the bar\nbelow for its category, and low when it's a routine restatement of\nsomething already known.\n\n- **Financial & market**: a spread, correlation, or volatility level\n  breaking a multi-year pattern; a rate surprise vs. consensus. Not:\n  routine daily moves, expected earnings, expected rate decisions.\n- **AI / research / AGI**: a capability that didn't exist last month —\n  a benchmark broken by a wide margin, a lab claiming a genuine first,\n  AGI/ASI used by a source that's never used it before. Not: another\n  incremental model release, another post restating known ideas.\n- **Saudi economy / urban / labour**: an actual policy change, not a\n  policy discussion; a number breaking a multi-year trend. Not:\n  routine indicator releases in line with expectations.\n- **Products & platforms**: a pattern or tool you haven't seen\n  implemented before, or one that solves your exact problem. Not:\n  another tutorial on something you already know.\n- **Mobile & infrastructure**: a way to do something on your stack\n  (Termux, mesh networking) that was previously painful or impossible.\n  Not: an incremental version bump.\n- **News & geopolitics**: an event that changes the odds of a\n  market-moving outcome. Not: continuation of an already-priced-in\n  situation.\n\n## Scoring guidance\n\n- Urgency 9-10: actionable today — a signal that would change a\n  decision if you saw it tomorrow instead of now.\n- Urgency 5-8: worth reading, fits a daily digest, not time-critical.\n- Urgency 1-4: tangential or already-known — low relevance or novelty.\n- Novelty is graded against the breakthrough bar above, and also\n  against what's already been filed recently (the scorer shows the\n  model your last ~15 entries so it doesn't re-flag the same thing\n  as a breakthrough twice).\n\nEdit the themes above freely. Nothing else in the pipeline needs to\nchange when you do.",
+      "relevance": 5,
+      "novelty": 5,
+      "urgency": 5,
+      "summary": "Signal OS",
+      "reason": "Scored via fallback system due to API or parsing error."
+    }
+  ],
+  "weekly_entries": [
+    {
+      "id": 1,
+      "timestamp": "2026-09-08T10:42:52.565816+00:00",
+      "issue_number": "5",
+      "pillar": "News & Dashboards",
+      "content": "Signal OS\n\n# Interest Profile — Mono Signal OS\n\nThis is the only file you should need to hand-edit as your interests shift.\nThe scorer reads it on every run and judges new inbox items against it —\nchange a line here and every future score reflects it immediately.\n\n## 🔵 Financial & Market Intelligence\n\n- Early signals of stock market stress or crashes: unusual volatility,\n  credit spread widening, forced-selling patterns, correlated drawdowns\n  across asset classes.\n- TASI (Saudi stock market) movements, sector rotations, and quant\n  signals — anything that would affect the TASI Quant Replicator.\n- Economic cycle turns relevant to timing decisions: rate-cut or\n  rate-hike signals, yield curve moves, anything that would change\n  a buy / sell / DCA decision on stocks or crypto.\n- Crypto regime shifts: Bitcoin halving cycle effects, liquidity\n  expansions, regulatory moves, on-chain anomalies.\n- SAMA (Saudi Central Bank) policy: DBR changes, restructuring rules,\n  mortgage regulation shifts.\n\n## 🟣 AI / Research / AGI\n\n- The word \"AGI\" or \"ASI\" appearing in a new context: a paper, a lab\n  announcement, a policy document, or a shift in how often it shows up\n  in arXiv abstracts or mainstream coverage.\n- Breakthroughs in agentic AI: new agent frameworks, tool-use\n  capabilities, autonomous coding, multi-agent orchestration.\n- AI model releases that change the capability frontier: new reasoning\n  models, multimodal systems, open-weight releases.\n- Bioinformatics + AI intersections relevant to ClawBio.\n\n## 🟢 Saudi Economy / Urban / Labour\n\n- Employment and AI intersecting: layoffs attributed to automation,\n  hiring freezes in roles exposed to AI tooling, new benchmarks on\n  job displacement.\n- Saudi Vision 2030 economic indicators, urban heat island data,\n  post-labour economy signals.\n- Agricultural technology and food security developments in the\n  Gulf region.\n\n## 🟠 Products & Platforms\n\n- Hudhud platform developments, PWA best practices, service worker\n  patterns for offline-first apps.\n- New approaches to personal AI assistants (moltis, PAI), local-first\n  AI, Rust-based systems.\n- Telegram bot frameworks and conversational AI patterns.\n\n## 🔴 Mobile & Infrastructure\n\n- Termux / Android native development breakthroughs, proot-free\n  approaches, single-binary deployments.\n- Mesh networking, peer-to-peer VPN, DNS sinkhole ad-blocking\n  advances.\n- Edge computing and on-device ML inference.\n\n## 🟡 News & Dashboards\n\n- Geopolitical signals that affect markets: energy policy, trade\n  tensions, sanctions, regional conflicts.\n- Intelligence pipeline architecture patterns, news aggregation\n  at scale, automated OSINT.\n\n## What counts as a breakthrough (vs. routine)\n\nThis is what the scorer checks \"novelty\" against. Vague relevance is\nnot enough — score novelty high only when the item clears the bar\nbelow for its category, and low when it's a routine restatement of\nsomething already known.\n\n- **Financial & market**: a spread, correlation, or volatility level\n  breaking a multi-year pattern; a rate surprise vs. consensus. Not:\n  routine daily moves, expected earnings, expected rate decisions.\n- **AI / research / AGI**: a capability that didn't exist last month —\n  a benchmark broken by a wide margin, a lab claiming a genuine first,\n  AGI/ASI used by a source that's never used it before. Not: another\n  incremental model release, another post restating known ideas.\n- **Saudi economy / urban / labour**: an actual policy change, not a\n  policy discussion; a number breaking a multi-year trend. Not:\n  routine indicator releases in line with expectations.\n- **Products & platforms**: a pattern or tool you haven't seen\n  implemented before, or one that solves your exact problem. Not:\n  another tutorial on something you already know.\n- **Mobile & infrastructure**: a way to do something on your stack\n  (Termux, mesh networking) that was previously painful or impossible.\n  Not: an incremental version bump.\n- **News & geopolitics**: an event that changes the odds of a\n  market-moving outcome. Not: continuation of an already-priced-in\n  situation.\n\n## Scoring guidance\n\n- Urgency 9-10: actionable today — a signal that would change a\n  decision if you saw it tomorrow instead of now.\n- Urgency 5-8: worth reading, fits a daily digest, not time-critical.\n- Urgency 1-4: tangential or already-known — low relevance or novelty.\n- Novelty is graded against the breakthrough bar above, and also\n  against what's already been filed recently (the scorer shows the\n  model your last ~15 entries so it doesn't re-flag the same thing\n  as a breakthrough twice).\n\nEdit the themes above freely. Nothing else in the pipeline needs to\nchange when you do.",
+      "relevance": 5,
+      "novelty": 5,
+      "urgency": 5,
+      "summary": "Signal OS",
+      "reason": "Scored via fallback system due to API or parsing error."
+    }
+  ],
+  "active_repos_24h": [
     {
       "name": "calc",
       "pillar": "financial",
       "pillar_emoji": "🔵",
-      "pushed_at": "2026-09-07T12:05:15Z",
+      "pushed_at": "2026-09-08T10:58:06Z",
       "url": "https://github.com/Muxd21/calc"
     },
     {
       "name": "post_labour_tracker",
       "pillar": "saudi",
       "pillar_emoji": "🟢",
-      "pushed_at": "2026-09-07T12:01:54Z",
+      "pushed_at": "2026-09-08T10:56:09Z",
       "url": "https://github.com/muxd22-alt/post_labour_tracker"
     },
     {
       "name": "FASTING",
       "pillar": "saudi",
       "pillar_emoji": "🟢",
-      "pushed_at": "2026-09-07T11:38:12Z",
+      "pushed_at": "2026-09-08T10:37:27Z",
       "url": "https://github.com/Muxd21/FASTING"
+    },
+    {
+      "name": "SectorShift",
+      "pillar": "financial",
+      "pillar_emoji": "🔵",
+      "pushed_at": "2026-09-08T08:28:47Z",
+      "url": "https://github.com/muxd22-alt/SectorShift"
     },
     {
       "name": "agri",
@@ -50,32 +91,32 @@
   ],
   "active_repos_7d": [
     {
-      "name": "SectorShift",
-      "pillar": "financial",
-      "pillar_emoji": "🔵",
-      "pushed_at": "2026-09-08T08:28:47Z",
-      "url": "https://github.com/muxd22-alt/SectorShift"
-    },
-    {
       "name": "calc",
       "pillar": "financial",
       "pillar_emoji": "🔵",
-      "pushed_at": "2026-09-07T12:05:15Z",
+      "pushed_at": "2026-09-08T10:58:06Z",
       "url": "https://github.com/Muxd21/calc"
     },
     {
       "name": "post_labour_tracker",
       "pillar": "saudi",
       "pillar_emoji": "🟢",
-      "pushed_at": "2026-09-07T12:01:54Z",
+      "pushed_at": "2026-09-08T10:56:09Z",
       "url": "https://github.com/muxd22-alt/post_labour_tracker"
     },
     {
       "name": "FASTING",
       "pillar": "saudi",
       "pillar_emoji": "🟢",
-      "pushed_at": "2026-09-07T11:38:12Z",
+      "pushed_at": "2026-09-08T10:37:27Z",
       "url": "https://github.com/Muxd21/FASTING"
+    },
+    {
+      "name": "SectorShift",
+      "pillar": "financial",
+      "pillar_emoji": "🔵",
+      "pushed_at": "2026-09-08T08:28:47Z",
+      "url": "https://github.com/muxd22-alt/SectorShift"
     },
     {
       "name": "AGI_Track",
