@@ -199,11 +199,20 @@ footer p{{font-size:13px;color:var(--muted);margin-bottom:4px}}
 .ai-tag{{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);background:#1c1c1e;padding:6px 14px;border-radius:20px;margin-top:12px}}
 .ai-dot{{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 4px rgba(48,209,88,.5)}}
 
-@media(max-width:768px){{.hero-overlay{{padding:20px 20px 24px}}.hero-title{{font-size:22px}}.grid{{grid-template-columns:1fr}}}
+@media(max-width:768px){{.hero-overlay{{padding:20px 20px 24px}}.hero-title{{font-size:22px}}.grid{{grid-template-columns:1fr}}}}
 @media(max-width:480px){{.nav-date{{display:none}}}}
 
 .card,.hero-link{{opacity:0;transform:translateY(16px);animation:fadeUp .5s ease forwards}}
-.hero-link{{animation-delay:.05s}}.card:nth-child(1){{animation-delay:.1s}}.card:nth-child(2){{animation-delay:.15s}}.card:nth-child(3){{animation-delay:.2s}}.card:nth-child(4){{animation-delay:.25s}}.card:nth-child(5){{animation-delay:.3s}}.card:nth-child(6){{animation-delay:.35s}}.card:nth-child(7){{animation-delay:.4s}}.card:nth-child(8){{animation-delay:.45s}}.card:nth-child(9){{animation-delay:.5s}}
+.hero-link{{animation-delay:.05s}}
+.card:nth-child(1){{animation-delay:.1s}}
+.card:nth-child(2){{animation-delay:.15s}}
+.card:nth-child(3){{animation-delay:.2s}}
+.card:nth-child(4){{animation-delay:.25s}}
+.card:nth-child(5){{animation-delay:.3s}}
+.card:nth-child(6){{animation-delay:.35s}}
+.card:nth-child(7){{animation-delay:.4s}}
+.card:nth-child(8){{animation-delay:.45s}}
+.card:nth-child(9){{animation-delay:.5s}}
 @keyframes fadeUp{{to{{opacity:1;transform:translateY(0)}}}}
 </style>
 </head>
@@ -222,7 +231,8 @@ footer p{{font-size:13px;color:var(--muted);margin-bottom:4px}}
 </main>
 <footer><div class="wrap"><p>AI Signal Daily &mdash; Curated by AI, for you</p><p>All articles, images, and commentary are AI-generated.</p><div class="ai-tag"><span class="ai-dot"></span>Powered by free-tier LLMs via OpenRouter</div></div></footer>
 <script>
-document.querySelectorAll('.chip').forEach(b=>{{b.addEventListener('click',()=>{{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');const c=b.dataset.cat;document.querySelectorAll('.card').forEach(x=>{{x.style.display=(c==='all'||x.dataset.cat===c)?'':'none'}})}})}})
+var chips = document.querySelectorAll('.chip');
+chips.forEach(function(b){{b.addEventListener('click', function(){{chips.forEach(function(x){{x.classList.remove('active')}});b.classList.add('active');var c = b.dataset.cat;document.querySelectorAll('.card').forEach(function(x){{x.style.display = (c === 'all' || x.dataset.cat === c) ? '' : 'none'}})}})}});
 </script>
 </body>
 </html>"""
