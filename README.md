@@ -1,4 +1,4 @@
-# AI Signal Daily
+# Signal OS
 
 AI-first tech news site. Articles, images, and commentary generated entirely by AI every morning.
 
