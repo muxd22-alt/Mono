@@ -25,7 +25,7 @@ def load_yaml(filename):
 def call_openrouter(model, system_prompt, user_prompt, max_tokens=1500, temperature=0.7):
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key:
-        return "(No API key)"
+        return ""
     try:
         resp = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -35,8 +35,8 @@ def call_openrouter(model, system_prompt, user_prompt, max_tokens=1500, temperat
         )
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"].strip()
-    except Exception as exc:
-        return f"(Error: {exc})"
+    except Exception:
+        return ""
 
 
 def generate_article_prompt(item, article_type):
@@ -77,11 +77,15 @@ def write_articles(items, budget=200):
     print(f"PHASE 3a: ARTICLE WRITING (Budget: {budget})")
     print(f"{'='*60}\n")
 
+    has_key = bool(os.environ.get("OPENROUTER_API_KEY"))
+    if not has_key:
+        print("[writer] WARNING: No OPENROUTER_API_KEY set. Using fallback content.")
+
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
     from free_models import get_free_models
 
-    writing_model = get_free_models(n=1)[0]
+    writing_model = get_free_models(n=1)[0] if has_key else "fallback"
     print(f"[writer] Model: {writing_model}")
 
     articles = []
@@ -94,9 +98,19 @@ def write_articles(items, budget=200):
         article_type = determine_article_type(item)
         print(f"[writer] {idx+1}/{daily_target} ({article_type}): {item['title'][:45]}...")
 
-        system, user = generate_article_prompt(item, article_type)
-        content = call_openrouter(writing_model, system, user)
-        used += 1
+        content = ""
+        if has_key:
+            system, user = generate_article_prompt(item, article_type)
+            content = call_openrouter(writing_model, system, user)
+            used += 1
+
+        # Fallback: use original summary if AI failed
+        if not content:
+            content = item.get("summary", item.get("title", "No content available."))
+
+        headline = content.split("\n")[0].replace("#", "").strip() if content else item.get("title", "")
+        if not headline or len(headline) < 10:
+            headline = item.get("title", "Untitled")
 
         articles.append({
             "id": idx + 1,
@@ -107,7 +121,7 @@ def write_articles(items, budget=200):
             "score": item.get("score", 0),
             "article_type": article_type,
             "content": content,
-            "headline": content.split("\n")[0].replace("#", "").strip() if content else item.get("title", ""),
+            "headline": headline,
             "written_at": dt.datetime.now(dt.timezone.utc).isoformat(),
             "model_used": writing_model,
             "image": None,

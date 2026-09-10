@@ -25,7 +25,7 @@ def load_yaml(filename):
 def call_openrouter(model, system_prompt, user_prompt, max_tokens=300, temperature=0.8):
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key:
-        return "(No API key)"
+        return ""
     try:
         resp = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -35,8 +35,8 @@ def call_openrouter(model, system_prompt, user_prompt, max_tokens=300, temperatu
         )
         resp.raise_for_status()
         return resp.json()["choices"][0]["message"]["content"].strip()
-    except Exception as exc:
-        return f"(Error: {exc})"
+    except Exception:
+        return ""
 
 
 PERSONAS = {
@@ -57,6 +57,11 @@ def add_comments(articles, budget=20):
     print(f"\n{'='*60}")
     print(f"PHASE 3c: COMMENT GENERATION (Budget: {budget})")
     print(f"{'='*60}\n")
+
+    has_key = bool(os.environ.get("OPENROUTER_API_KEY"))
+    if not has_key:
+        print("[commenter] WARNING: No OPENROUTER_API_KEY. Skipping comments.")
+        return articles
 
     import sys
     sys.path.insert(0, str(Path(__file__).parent))

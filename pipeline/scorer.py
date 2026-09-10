@@ -76,7 +76,7 @@ def score_items(items, budget_remaining=50):
     ai_budget = min(budget_remaining, scoring_config.get("llm_review_top_n", 50))
     openrouter_key = os.environ.get("OPENROUTER_API_KEY")
     if not openrouter_key:
-        print("[scorer] No OPENROUTER_API_KEY, skipping AI scoring")
+        print("[scorer] No OPENROUTER_API_KEY. Using keyword scores only.")
         return items
 
     print(f"[scorer] AI scoring top {ai_budget} items...")
